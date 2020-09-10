@@ -17,12 +17,12 @@ ENV TINI_PLATFORM tini
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${TINI_PLATFORM} /tini
 RUN chmod +x /tini
 
-# Clone FluidFramework to be able to copy Tinylicious
-RUN git clone --depth 1 --branch main --single-branch https://github.com/microsoft/FluidFramework.git /tmp/FluidFramework
-
-# Copy tinylicious and then remove the FluidFramework repo
-RUN cp -r /tmp/FluidFramework/server/tinylicious /usr/src/server && rm -rf /tmp/FluidFramework
+# Copy over and build the server
 WORKDIR /usr/src/server
+
+# Copy over the package and package-lock and install prior to the other code to optimize Docker's file system cache on rebuilds
+COPY package.json .
+COPY package-lock.json .
 
 # Need to set the --unsafe-perm flag since we are doing the install as root. Consider adding an 'app' accout so we
 # can do the install as node but then switch to 'app' to run. As app we won't be able to write to installed files
@@ -32,10 +32,12 @@ RUN npm install
 # Expose the port the app runs under
 EXPOSE 3000
 
+# And now copy over our actual code and build
+COPY . .
+
 # And build
 RUN npm run tsc
 
-# Storage directories
 RUN mkdir /var/lib/tinylicious && chown node:node /var/lib/tinylicious
 RUN mkdir /var/lib/db && chown node:node /var/lib/db
 
