@@ -33,7 +33,7 @@
     },
     "storage": "/var/lib/tinylicious/snapshots",
     "db": {
-        "inMemory": true,
+        "inMemory": false,
         "path": "/var/lib/tinylicious/db"
     },
     "error": {
