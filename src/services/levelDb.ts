@@ -58,7 +58,7 @@ export class LevelDb extends EventEmitter implements IDb {
                     limit: MaxFetchSize,
                 };
             default:
-                throw new Error("Collection not implemented.");
+                throw new Error(`Collection ${name} not implemented.`);
         }
     }
 }
